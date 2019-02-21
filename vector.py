@@ -74,8 +74,11 @@ class Vector(object):
         mag1 = self.magnitude()
         mag2 = v.magnitude()
         intermediate = dot/(mag1*mag2)
+        if intermediate > 1:
+            intermediate = 1
         angle = math.acos(intermediate)
         return angle
+        
     
     #check parallel
     def parallel(self,v):
