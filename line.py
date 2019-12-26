@@ -36,7 +36,7 @@ class Line(object):
             initial_index = Line.first_nonzero_index(n)
             initial_coefficient = n[initial_index]
 
-            basepoint_coords[initial_index] = c/initial_coefficient
+            basepoint_coords[initial_index] = float(c)/float(initial_coefficient)
             self.basepoint = Vector(basepoint_coords)
 
         except Exception as e:
@@ -101,17 +101,34 @@ class Line(object):
         if not self.is_parallel(Line):
                 return False
         a = self.basepoint
-        b = Line.basepoint
-        #new vector between basepoints
-        c = a.minus(b)
-        print c
-        #flip c
-        l = len(c.coordinates)
-        for i in range(l):
-                d = Vector[]
-                d.append(c.doordinates[l-i])
-        # see if d (normal to new line) is parallel to original line   
-                
+        b = Line.basepoint 
+        
+        if a.coordinates == b.coordinates:
+            return True
+        else:
+            return False
+        
+    def intersection(self, Line):
+        #check if the lines are parallel /equal
+        if self.is_parallel(Line):
+            if self.is_equal(Line):
+                print("SAME LINE")
+                return (float("inf"), float("inf"))
+            else:
+                print("NO INTERSECTION")
+                return (None,None)
+        
+        A = float(self.normal_vector[0])
+        B = float(self.normal_vector[1])
+        C = float(Line.normal_vector[0])
+        D = float(Line.normal_vector[1])
+        k1 = float(self.constant_term)
+        k2 = float(Line.constant_term)
+        
+        denom = A*D - B*C
+        x = (D*k1 - B*k2)/denom
+        y = (-C*k1 + A*k2)/denom
+        return (x,y)
         
         
             
@@ -127,18 +144,6 @@ class MyDecimal(Decimal):
     def is_near_zero(self, eps=1e-10):
         return abs(self) < eps
 
-#test code    
-l1 = Line([2,3],4)
-l2 = Line([2,3],6)
-l3 = Line([4,5],3)
 
-##a = l1.is_parallel(l2)
-##b = l1.is_parallel(l3)
-##print a
-##print b
-
-c = l1.basepoint
-d = l2.basepoint
-print c, d 
 
 

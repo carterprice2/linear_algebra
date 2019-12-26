@@ -126,6 +126,4 @@ class Vector(object):
     def __eq__(self, v):
         return self.coordinates == v.coordinates
     
-    
-v1 = Vector([8.462,7.893,-8.187])
-v2 = Vector([6.984,-5.975,4.778])  
+
