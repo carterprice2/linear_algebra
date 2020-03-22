@@ -1,3 +1,11 @@
+#!/usr/bin/env python2
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Mar 21 16:53:48 2020
+
+@author: carter
+"""
+
 from decimal import Decimal, getcontext
 
 from vector import Vector
@@ -5,14 +13,12 @@ from vector import Vector
 getcontext().prec = 30
 
 
-class Line(object):
+class Plane(object):
 
     NO_NONZERO_ELTS_FOUND_MSG = 'No nonzero elements found'
 
-    #defines the line by its normal vector and the constant for the line's equation
-    #equation in the form of Ax + By = k, [A B] <- normal vector, k <- constant
     def __init__(self, normal_vector=None, constant_term=None):
-        self.dimension = 2
+        self.dimension = 3
 
         if not normal_vector:
             all_zeros = ['0']*self.dimension
@@ -24,7 +30,6 @@ class Line(object):
         self.constant_term = Decimal(constant_term)
 
         self.set_basepoint()
-        #print 'Line Initialized'
 
 
     def set_basepoint(self):
@@ -33,14 +38,14 @@ class Line(object):
             c = self.constant_term
             basepoint_coords = ['0']*self.dimension
 
-            initial_index = Line.first_nonzero_index(n)
-            initial_coefficient = n[initial_index]
+            initial_index = Plane.first_nonzero_index(n)
+            initial_coefficient = Decimal(n[initial_index])
 
-            basepoint_coords[initial_index] = float(c)/float(initial_coefficient)
+            basepoint_coords[initial_index] = c/initial_coefficient
             self.basepoint = Vector(basepoint_coords)
 
         except Exception as e:
-            if str(e) == Line.NO_NONZERO_ELTS_FOUND_MSG:
+            if str(e) == Plane.NO_NONZERO_ELTS_FOUND_MSG:
                 self.basepoint = None
             else:
                 raise e
@@ -73,7 +78,7 @@ class Line(object):
         n = self.normal_vector
 
         try:
-            initial_index = Line.first_nonzero_index(n)
+            initial_index = Plane.first_nonzero_index(n)
             terms = [write_coefficient(n[i], is_initial_term=(i==initial_index)) + 'x_{}'.format(i+1)
                      for i in range(self.dimension) if round(n[i], num_decimal_places) != 0]
             output = ' '.join(terms)
@@ -91,60 +96,31 @@ class Line(object):
 
         return output
 
-    def is_parallel(self, Line):
+    def is_parallel(self, plane):
         v1 = Vector(self.normal_vector)
-        v2 = Vector(Line.normal_vector)
+        v2 = Vector(plane.normal_vector)
         return v1.parallel(v2)
-
-        
-    def is_equal(self, Line, debug=False):
-        if not self.is_parallel(Line):
+    
+    def is_equal(self, plane): 
+        if not self.is_parallel(plane):
                 return False
         a = self.basepoint
-        b = Line.basepoint 
+        b = plane.basepoint 
         diff = a.minus(b)
-            
+        
         if diff.is_zero():
             return True
         else:
             return False
-        
-    def intersection(self, Line):
-        #check if the lines are parallel /equal
-        if self.is_parallel(Line):
-            if self.is_equal(Line):
-                print("SAME LINE")
-                return (float("inf"), float("inf"))
-            else:
-                print("NO INTERSECTION")
-                return (None,None)
-        
-        A = float(self.normal_vector[0])
-        B = float(self.normal_vector[1])
-        C = float(Line.normal_vector[0])
-        D = float(Line.normal_vector[1])
-        k1 = float(self.constant_term)
-        k2 = float(Line.constant_term)
-        
-        denom = A*D - B*C
-        x = (D*k1 - B*k2)/denom
-        y = (-C*k1 + A*k2)/denom
-        return (x,y)
-        
-        
-            
+
     @staticmethod
     def first_nonzero_index(iterable):
         for k, item in enumerate(iterable):
             if not MyDecimal(item).is_near_zero():
                 return k
-        raise Exception(Line.NO_NONZERO_ELTS_FOUND_MSG)
+        raise Exception(Plane.NO_NONZERO_ELTS_FOUND_MSG)
 
 
 class MyDecimal(Decimal):
     def is_near_zero(self, eps=1e-10):
         return abs(self) < eps
-
-
-
-

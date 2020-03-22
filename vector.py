@@ -5,7 +5,7 @@ Created on Sat Feb  9 19:51:51 2019
 @author: Carter
 """
 import math
-import decimal
+from decimal import Decimal
 
 # note all vectors must have the same length
 
@@ -14,7 +14,7 @@ class Vector(object):
         try:
             if not coordinates:
                 raise ValueError
-            self.coordinates = tuple(coordinates)
+            self.coordinates = tuple([Decimal(x) for x in coordinates])
             self.dimension = len(self.coordinates)
 
         except ValueError:
@@ -46,6 +46,7 @@ class Vector(object):
         for i in range(n):
             sum_square = sum_square + self.coordinates[i]**2
         a = math.sqrt(sum_square)
+        a = Decimal(a)
         return a
     
     #this function returns the unit vector
@@ -55,7 +56,7 @@ class Vector(object):
             unit_coordinates = []
             n = self.dimension
             for i in range(n):
-                unit_coordinates.append(1/m * self.coordinates[i])
+                unit_coordinates.append(Decimal(1.0)/m * self.coordinates[i])
             return Vector(unit_coordinates)
         except ZeroDivisionError:
             raise Exception('Cannot normalize the zero vector')
@@ -63,13 +64,17 @@ class Vector(object):
     #dot product or inner product
     def dot(self,v):
         n = len(self.coordinates)
-        sum = 0
+        sum = Decimal(0)
         for i in range(n):
             sum = sum + self.coordinates[i]*v.coordinates[i]
         return sum
     
     #find angle between two vectors
     def dot_angle(self,v):
+        u1 = self.normalize()
+        u2 = v.normalize()
+        angle = math.acos(u1.dot(u2))
+        '''
         dot = self.dot(v)
         mag1 = self.magnitude()
         mag2 = v.magnitude()
@@ -77,12 +82,13 @@ class Vector(object):
         if intermediate > 1:
             intermediate = 1
         angle = math.acos(intermediate)
+        '''
         return angle
         
     
     #check parallel
     def parallel(self,v):
-        if  self.is_zero() or v.is_zero() or abs(self.dot_angle(v)) < 1e-10 or self.dot_angle(v) == math.pi:
+        if  self.is_zero() or v.is_zero() or abs(self.dot_angle(v)) < 1e-6 or self.dot_angle(v) == math.pi:
             return True
         else:
             return False
